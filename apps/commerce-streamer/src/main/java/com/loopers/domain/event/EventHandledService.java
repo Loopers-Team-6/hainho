@@ -13,10 +13,10 @@ public class EventHandledService {
     @Transactional
     public boolean markHandledIfAbsent(String eventId, String groupId) {
         int inserted = eventHandledRepository.insertOrIgnoreDuplicate(eventId, groupId);
-        return isDuplicate(inserted);
+        return isSuccess(inserted);
     }
 
-    private boolean isDuplicate(int inserted) {
-        return inserted == 0;
+    private boolean isSuccess(int inserted) {
+        return inserted == 1;
     }
 }
