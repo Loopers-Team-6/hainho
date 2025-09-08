@@ -57,7 +57,14 @@ public class LikeService {
     public LikeInfo.Get getLikeProductInfo(Long userId, Long productId) {
         LikeProductCount likeProductCount = likeProductCountRepository.find(productId)
                 .orElseThrow(() -> new CoreException(ErrorType.NOT_FOUND, "상품 좋아요 카운트 데이터가 존재하지 않습니다. productId: " + productId));
-        Boolean isLiked = likeProductRepository.exists(userId, productId);
+        Boolean isLiked = isExistsLikeProduct(userId, productId);
         return LikeInfo.Get.from(likeProductCount, isLiked);
+    }
+
+    private boolean isExistsLikeProduct(Long userId, Long productId) {
+        if (userId == null) {
+            return false;
+        }
+        return likeProductRepository.exists(userId, productId);
     }
 }

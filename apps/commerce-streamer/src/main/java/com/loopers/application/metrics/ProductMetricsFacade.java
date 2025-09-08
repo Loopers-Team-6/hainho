@@ -19,6 +19,7 @@ public class ProductMetricsFacade {
     private final EventHandledService eventHandledService;
     private final ProductMetricsService productMetricsService;
 
+    @Transactional
     public void accumulateViews(ProductFound event, String eventId, String groupId, ZonedDateTime processedAt) {
         if (!eventHandledService.markHandledIfAbsent(eventId, groupId)) {
             return;

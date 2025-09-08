@@ -65,4 +65,58 @@ public class ProductV1Dto {
             }
         }
     }
+
+    @NoArgsConstructor(access = AccessLevel.PRIVATE)
+    public static class GetDetail {
+        public record Request(
+                Long id
+        ) {
+        }
+
+        public record Response(
+                Product product
+        ) {
+            public static Response from(ProductResult.Get.Detail detail) {
+                return new Response(Product.from(detail));
+            }
+
+            public record Product(
+                    Long id,
+                    String name,
+                    Long price,
+                    Brand brand,
+                    Like like,
+                    String description
+            ) {
+                public static Product from(ProductResult.Get.Detail product) {
+                    return new Product(
+                            product.id(),
+                            product.name(),
+                            product.price(),
+                            Brand.from(product.brand()),
+                            Like.from(product.like()),
+                            product.description()
+                    );
+                }
+            }
+
+            public record Brand(
+                    Long id,
+                    String name
+            ) {
+                public static Brand from(ProductResult.Get.Detail.Brand brand) {
+                    return new Brand(brand.id(), brand.name());
+                }
+            }
+
+            public record Like(
+                    Long count,
+                    Boolean isLiked
+            ) {
+                public static Like from(ProductResult.Get.Detail.Like like) {
+                    return new Like(like.count(), like.isLiked());
+                }
+            }
+        }
+    }
 }

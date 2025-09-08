@@ -6,7 +6,6 @@ import com.loopers.interfaces.consumer.KafkaMessage;
 import com.loopers.interfaces.consumer.audit.OrderCompleted;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
-import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.kafka.support.Acknowledgment;
@@ -23,13 +22,12 @@ public class MetricsConsumer {
     private String groupId;
 
     @KafkaListener(
-            topics = {"${kafka.topic.catalog}, ${kafka.topic.order}"},
+            topics = {"${kafka.topic.catalog}", "${kafka.topic.order}"},
             groupId = "${kafka.group.metrics}",
             containerFactory = KafkaConfig.BATCH_LISTENER
     )
-    public void consume(List<ConsumerRecord<String, KafkaMessage<?>>> records, Acknowledgment acknowledgment) {
-        for (ConsumerRecord<String, KafkaMessage<?>> record : records) {
-            KafkaMessage<?> message = record.value();
+    public void consume(List<KafkaMessage<?>> messages, Acknowledgment acknowledgment) {
+        for (KafkaMessage<?> message : messages) {
             switch (message.eventType()) {
                 case "OrderCompleted" -> {
                     OrderCompleted event = (OrderCompleted) message.payload();
