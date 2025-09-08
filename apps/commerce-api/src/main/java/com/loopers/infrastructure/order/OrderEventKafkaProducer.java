@@ -16,7 +16,7 @@ import org.springframework.transaction.event.TransactionalEventListener;
 @Component
 @RequiredArgsConstructor(access = AccessLevel.PROTECTED)
 public class OrderEventKafkaProducer {
-    private final KafkaTemplate<String, Object> kafkaTemplate;
+    private final KafkaTemplate<Object, Object> kafkaTemplate;
 
     @Value("${kafka.topics.order}")
     private String topic;

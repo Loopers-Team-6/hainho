@@ -14,7 +14,7 @@ import org.springframework.transaction.event.TransactionalEventListener;
 @Component
 @RequiredArgsConstructor(access = AccessLevel.PROTECTED)
 public class ProductEventKafkaProducer {
-    private final KafkaTemplate<String, Object> kafkaTemplate;
+    private final KafkaTemplate<Object, Object> kafkaTemplate;
 
     @Value("${kafka.topics.catalog}")
     private String topic;
