@@ -29,4 +29,21 @@ public interface ProductV1ApiSepc {
             )
             Long userId
     );
+
+    @Operation(
+            summary = "상품 상세 조회",
+            description = "상품 상세 정보를 조회합니다."
+    )
+    ApiResponse<ProductV1Dto.GetDetail.Response> getProduct(
+            @Schema(
+                    name = "productId",
+                    description = "조회할 상품의 ID"
+            )
+            Long productId,
+            @Schema(
+                    name = "X-USER-ID",
+                    description = "조회할 사용자의 ID"
+            )
+            Long userId
+    );
 }

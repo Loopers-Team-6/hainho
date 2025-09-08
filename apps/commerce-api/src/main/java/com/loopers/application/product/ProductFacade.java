@@ -19,7 +19,7 @@ public class ProductFacade {
     private final LikeService likeService;
 
     public ProductResult.Get.Detail getProductDetail(Long userId, Long productId) {
-        ProductInfo.Get productInfo = productService.getProductInfo(userId, productId);
+        ProductInfo.Get productInfo = productService.getProductInfo(productId, userId);
         BrandInfo.Get brandInfo = brandService.getBrandInfo(productInfo.brandId());
         LikeInfo.Get likeInfo = likeService.getLikeProductInfo(userId, productId);
 

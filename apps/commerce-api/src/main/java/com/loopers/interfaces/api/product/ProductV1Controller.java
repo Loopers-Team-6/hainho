@@ -6,10 +6,7 @@ import com.loopers.interfaces.api.ApiResponse;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestHeader;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api/v1")
@@ -27,6 +24,17 @@ public class ProductV1Controller implements ProductV1ApiSepc {
     ) {
         ProductResult.Get.Page page = productFacade.getProductPage(userId, request.brandId(), pageable);
         ProductV1Dto.GetProducts.Response response = ProductV1Dto.GetProducts.Response.from(page, pageable);
+        return ApiResponse.success(response);
+    }
+
+    @Override
+    @GetMapping("/products/{productId}")
+    public ApiResponse<ProductV1Dto.GetDetail.Response> getProduct(
+            @PathVariable Long productId,
+            @RequestHeader(value = "X-USER-ID", required = false) Long userId
+    ) {
+        ProductResult.Get.Detail detail = productFacade.getProductDetail(userId, productId);
+        ProductV1Dto.GetDetail.Response response = ProductV1Dto.GetDetail.Response.from(detail);
         return ApiResponse.success(response);
     }
 }
