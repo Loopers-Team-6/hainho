@@ -7,7 +7,6 @@ import com.loopers.interfaces.consumer.metrics.LikeProductCreated;
 import com.loopers.interfaces.consumer.metrics.LikeProductDeleted;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
-import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.kafka.support.Acknowledgment;
@@ -28,9 +27,8 @@ public class CacheEvictConsumer {
             groupId = "${kafka.group.cache-evict}",
             containerFactory = KafkaConfig.BATCH_LISTENER
     )
-    public void consume(List<ConsumerRecord<String, KafkaMessage<?>>> records, Acknowledgment acknowledgment) {
-        for (ConsumerRecord<String, KafkaMessage<?>> record : records) {
-            KafkaMessage<?> message = record.value();
+    public void consume(List<KafkaMessage<?>> messages, Acknowledgment acknowledgment) {
+        for (KafkaMessage<?> message : messages) {
             switch (message.eventType()) {
                 case "LikeProductCreated" -> {
                     LikeProductCreated event = (LikeProductCreated) message.payload();

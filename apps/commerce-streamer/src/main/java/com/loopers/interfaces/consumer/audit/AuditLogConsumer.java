@@ -5,7 +5,6 @@ import com.loopers.confg.kafka.KafkaConfig;
 import com.loopers.interfaces.consumer.KafkaMessage;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
-import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.kafka.support.Acknowledgment;
@@ -26,9 +25,8 @@ public class AuditLogConsumer {
             groupId = "${kafka.group.audit-log}",
             containerFactory = KafkaConfig.BATCH_LISTENER
     )
-    public void consume(List<ConsumerRecord<String, KafkaMessage<?>>> records, Acknowledgment acknowledgment) {
-        for (ConsumerRecord<String, KafkaMessage<?>> record : records) {
-            KafkaMessage<?> message = record.value();
+    public void consume(List<KafkaMessage<?>> messages, Acknowledgment acknowledgment) {
+        for (KafkaMessage<?> message : messages) {
             switch (message.eventType()) {
                 case "OrderCreated" -> {
                     OrderCreated value = (OrderCreated) message.payload();
