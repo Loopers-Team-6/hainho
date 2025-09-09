@@ -1,6 +1,5 @@
 package com.loopers.interfaces.consumer.audit;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.loopers.confg.kafka.KafkaConfig;
 import org.apache.kafka.clients.consumer.ConsumerConfig;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -32,7 +31,7 @@ public class AuditLogKafkaConfig {
     @Bean(name = AUDIT_LOG_LISTENER)
     public ConcurrentKafkaListenerContainerFactory<Object, Object> auditLogListenerContainerFactory(
             @Qualifier(AUDIT_LOG_CONSUMER_FACTORY) ConsumerFactory<Object, Object> auditLogConsumerFactory,
-            ObjectMapper objectMapper
+            ByteArrayJsonMessageConverter converter
     ) {
         Map<String, Object> consumerConfig = new HashMap<>(auditLogConsumerFactory.getConfigurationProperties());
         consumerConfig.put(ConsumerConfig.SESSION_TIMEOUT_MS_CONFIG, KafkaConfig.SESSION_TIMEOUT_MS);
@@ -42,7 +41,7 @@ public class AuditLogKafkaConfig {
         ConcurrentKafkaListenerContainerFactory<Object, Object> factory = new ConcurrentKafkaListenerContainerFactory<>();
         factory.setConsumerFactory(new DefaultKafkaConsumerFactory<>(consumerConfig));
         factory.getContainerProperties().setAckMode(ContainerProperties.AckMode.MANUAL);
-        factory.setRecordMessageConverter(new ByteArrayJsonMessageConverter(objectMapper));
+        factory.setRecordMessageConverter(converter);
         factory.setConcurrency(3);
         factory.setBatchListener(false);
         return factory;

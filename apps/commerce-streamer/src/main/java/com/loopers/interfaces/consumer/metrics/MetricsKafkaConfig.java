@@ -1,6 +1,5 @@
 package com.loopers.interfaces.consumer.metrics;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.loopers.confg.kafka.KafkaConfig;
 import org.apache.kafka.clients.consumer.ConsumerConfig;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -33,7 +32,7 @@ public class MetricsKafkaConfig {
     @Bean(name = METRICS_LISTENER)
     public ConcurrentKafkaListenerContainerFactory<Object, Object> metricsListenerContainerFactory(
             @Qualifier(METRICS_CONSUMER_FACTORY) ConsumerFactory<Object, Object> metricsConsumerFactory,
-            ObjectMapper objectMapper
+            ByteArrayJsonMessageConverter converter
     ) {
         Map<String, Object> consumerConfig = new HashMap<>(metricsConsumerFactory.getConfigurationProperties());
         consumerConfig.put(ConsumerConfig.MAX_POLL_RECORDS_CONFIG, KafkaConfig.MAX_POLLING_SIZE);
@@ -46,7 +45,7 @@ public class MetricsKafkaConfig {
         ConcurrentKafkaListenerContainerFactory<Object, Object> factory = new ConcurrentKafkaListenerContainerFactory<>();
         factory.setConsumerFactory(new DefaultKafkaConsumerFactory<>(consumerConfig));
         factory.getContainerProperties().setAckMode(ContainerProperties.AckMode.MANUAL);
-        factory.setBatchMessageConverter(new BatchMessagingMessageConverter(new ByteArrayJsonMessageConverter(objectMapper)));
+        factory.setBatchMessageConverter(new BatchMessagingMessageConverter(converter));
         factory.setConcurrency(3);
         factory.setBatchListener(true);
         return factory;
