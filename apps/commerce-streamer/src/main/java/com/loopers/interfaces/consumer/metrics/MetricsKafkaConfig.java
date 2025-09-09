@@ -21,6 +21,7 @@ import java.util.Map;
 public class MetricsKafkaConfig {
     public static final String METRICS_LISTENER = "metricsListener";
     public static final String METRICS_CONSUMER_FACTORY = "metricsConsumerFactory";
+    public static final String METRICS_GROUP = "metrics-group";
 
     @Bean(METRICS_CONSUMER_FACTORY)
     public ConsumerFactory<Object, Object> metricsConsumerFactory(KafkaProperties kafkaProperties) {

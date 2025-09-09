@@ -21,6 +21,7 @@ import java.util.Map;
 public class CacheEvictKafkaConfig {
     public static final String CACHE_EVICT_LISTENER = "cacheEvictListener";
     public static final String CACHE_EVICT_CONSUMER_FACTORY = "cacheEvictConsumerFactory";
+    public static final String CACHE_EVICT_GROUP = "cache-evict-group";
 
     @Bean(CACHE_EVICT_CONSUMER_FACTORY)
     public ConsumerFactory<Object, Object> cacheEvictConsumerFactory(KafkaProperties kafkaProperties) {

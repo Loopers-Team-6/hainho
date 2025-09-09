@@ -1,12 +1,12 @@
 package com.loopers.infrastructure.order;
 
+import com.loopers.confg.kafka.KafkaTopics;
 import com.loopers.domain.order.OrderCancelled;
 import com.loopers.domain.order.OrderCompleted;
 import com.loopers.domain.order.OrderCreated;
 import com.loopers.infrastructure.kafka.KafkaMessage;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
@@ -18,16 +18,13 @@ import org.springframework.transaction.event.TransactionalEventListener;
 public class OrderEventKafkaProducer {
     private final KafkaTemplate<Object, Object> kafkaTemplate;
 
-    @Value("${kafka.topics.order}")
-    private String topic;
-
     @Async
     @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
     public void produce(OrderCreated event) {
         KafkaMessage<OrderCreated> kafkaMessage = KafkaMessage.from(event);
         // 감사 로그 용
         // 주문 생성 이벤트는 주문 ID를 키로 사용하여 순서 보장
-        kafkaTemplate.send(topic, event.orderId().toString(), kafkaMessage);
+        kafkaTemplate.send(KafkaTopics.ORDER, event.orderId().toString(), kafkaMessage);
     }
 
     @Async
@@ -36,7 +33,7 @@ public class OrderEventKafkaProducer {
         KafkaMessage<OrderCancelled> kafkaMessage = KafkaMessage.from(event);
         // 감사 로그 용
         // 주문 취소 이벤트는 주문 ID를 키로 사용하여 순서 보장
-        kafkaTemplate.send(topic, event.orderId().toString(), kafkaMessage);
+        kafkaTemplate.send(KafkaTopics.ORDER, event.orderId().toString(), kafkaMessage);
     }
 
     @Async
@@ -45,6 +42,6 @@ public class OrderEventKafkaProducer {
         KafkaMessage<OrderCompleted> kafkaMessage = KafkaMessage.from(event);
         // 감사 로그 용 && 통계용
         // 주문 완료 이벤트는 주문 ID를 키로 사용하여 순서 보장
-        kafkaTemplate.send(topic, event.orderId().toString(), kafkaMessage);
+        kafkaTemplate.send(KafkaTopics.ORDER, event.orderId().toString(), kafkaMessage);
     }
 }

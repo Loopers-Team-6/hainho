@@ -20,6 +20,7 @@ import java.util.Map;
 public class AuditLogKafkaConfig {
     public static final String AUDIT_LOG_LISTENER = "auditLogListener";
     public static final String AUDIT_LOG_CONSUMER_FACTORY = "auditLogConsumerFactory";
+    public static final String AUDIT_LOG_GROUP = "audit-log-group";
 
     @Bean(AUDIT_LOG_CONSUMER_FACTORY)
     public ConsumerFactory<Object, Object> auditLogConsumerFactory(KafkaProperties kafkaProperties) {
