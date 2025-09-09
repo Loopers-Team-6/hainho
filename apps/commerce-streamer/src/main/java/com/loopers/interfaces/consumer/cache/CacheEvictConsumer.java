@@ -1,7 +1,6 @@
 package com.loopers.interfaces.consumer.cache;
 
 import com.loopers.application.cache.CacheEvictFacade;
-import com.loopers.confg.kafka.KafkaConfig;
 import com.loopers.interfaces.consumer.KafkaMessage;
 import com.loopers.interfaces.consumer.metrics.LikeProductCreated;
 import com.loopers.interfaces.consumer.metrics.LikeProductDeleted;
@@ -25,7 +24,7 @@ public class CacheEvictConsumer {
     @KafkaListener(
             topics = {"${kafka.topic.catalog}"},
             groupId = "${kafka.group.cache-evict}",
-            containerFactory = KafkaConfig.BATCH_LISTENER
+            containerFactory = CacheEvictKafkaConfig.CACHE_EVICT_LISTENER
     )
     public void consume(List<KafkaMessage<?>> messages, Acknowledgment acknowledgment) {
         for (KafkaMessage<?> message : messages) {

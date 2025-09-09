@@ -1,7 +1,6 @@
 package com.loopers.interfaces.consumer.metrics;
 
 import com.loopers.application.metrics.ProductMetricsFacade;
-import com.loopers.confg.kafka.KafkaConfig;
 import com.loopers.interfaces.consumer.KafkaMessage;
 import com.loopers.interfaces.consumer.audit.OrderCompleted;
 import lombok.AccessLevel;
@@ -24,7 +23,7 @@ public class MetricsConsumer {
     @KafkaListener(
             topics = {"${kafka.topic.catalog}", "${kafka.topic.order}"},
             groupId = "${kafka.group.metrics}",
-            containerFactory = KafkaConfig.BATCH_LISTENER
+            containerFactory = MetricsKafkaConfig.METRICS_LISTENER
     )
     public void consume(List<KafkaMessage<?>> messages, Acknowledgment acknowledgment) {
         for (KafkaMessage<?> message : messages) {
