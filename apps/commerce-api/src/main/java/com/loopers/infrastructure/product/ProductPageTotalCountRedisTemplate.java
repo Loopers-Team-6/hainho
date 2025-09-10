@@ -29,7 +29,11 @@ public class ProductPageTotalCountRedisTemplate {
 
     public Optional<Long> find(Long brandId) {
         String key = generateKey(brandId);
-        Long count = (Long) redisTemplate.opsForValue().get(key);
+        Object raw = redisTemplate.opsForValue().get(key);
+        if (raw == null) {
+            return Optional.empty();
+        }
+        Long count = (Long) raw;
         return Optional.ofNullable(count);
     }
 

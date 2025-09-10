@@ -22,6 +22,7 @@ spring:
     import:
       - jpa.yml
       - redis.yml
+      - kafka.yml
       - logging.yml
       - monitoring.yml
 
@@ -29,6 +30,12 @@ springdoc:
   use-fqn: true
   swagger-ui:
     path: /swagger-ui.html
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: "health,info,prometheus"
 
 ---
 spring:
