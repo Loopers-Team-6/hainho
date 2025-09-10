@@ -2,10 +2,10 @@ package com.loopers.application.metrics;
 
 import com.loopers.domain.event.EventHandledService;
 import com.loopers.domain.metrics.ProductMetricsService;
-import com.loopers.interfaces.consumer.audit.OrderCompleted;
-import com.loopers.interfaces.consumer.metrics.LikeProductCreated;
-import com.loopers.interfaces.consumer.metrics.LikeProductDeleted;
-import com.loopers.interfaces.consumer.metrics.ProductFound;
+import com.loopers.interfaces.consumer.events.catalog.LikeProductCreated;
+import com.loopers.interfaces.consumer.events.catalog.LikeProductDeleted;
+import com.loopers.interfaces.consumer.events.catalog.ProductFound;
+import com.loopers.interfaces.consumer.events.order.OrderCompleted;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;

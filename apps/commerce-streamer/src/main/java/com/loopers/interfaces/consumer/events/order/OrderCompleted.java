@@ -1,4 +1,4 @@
-package com.loopers.interfaces.consumer.audit;
+package com.loopers.interfaces.consumer.events.order;
 
 import java.util.List;
 
@@ -7,7 +7,7 @@ public record OrderCompleted(
         Long userId,
         Long totalPrice,
         List<OrderItem> items
-) {
+) implements OrderTopicEvent {
     public record OrderItem(
             Long productId,
             Long quantity,

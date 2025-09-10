@@ -2,8 +2,8 @@ package com.loopers.application.cache;
 
 import com.loopers.domain.cache.CacheEvictService;
 import com.loopers.domain.event.EventHandledService;
-import com.loopers.interfaces.consumer.metrics.LikeProductCreated;
-import com.loopers.interfaces.consumer.metrics.LikeProductDeleted;
+import com.loopers.interfaces.consumer.events.catalog.LikeProductCreated;
+import com.loopers.interfaces.consumer.events.catalog.LikeProductDeleted;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;

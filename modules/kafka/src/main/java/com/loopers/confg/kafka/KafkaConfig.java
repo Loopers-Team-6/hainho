@@ -1,6 +1,7 @@
 package com.loopers.confg.kafka;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.kafka.clients.consumer.ConsumerConfig;
 import org.springframework.boot.autoconfigure.kafka.KafkaProperties;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
@@ -17,6 +18,7 @@ import org.springframework.kafka.support.converter.ByteArrayJsonMessageConverter
 import java.util.HashMap;
 import java.util.Map;
 
+@Slf4j
 @EnableKafka
 @Configuration
 @EnableConfigurationProperties(KafkaProperties.class)
