@@ -21,17 +21,13 @@ public class LikeEventKafkaProducer {
     @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
     public void produce(LikeProductCreated event) {
         KafkaMessage<LikeProductCreated> kafkaMessage = KafkaMessage.from(event);
-        // 메트릭용 && 캐시 무효화
-        // 순서 보장이 필요 없으므로 key 없이 전송
-        kafkaTemplate.send(KafkaTopics.CATALOG, kafkaMessage);
+        kafkaTemplate.send(KafkaTopics.CATALOG, event.productId().toString(), kafkaMessage);
     }
 
     @Async
     @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
     public void produce(LikeProductDeleted event) {
         KafkaMessage<LikeProductDeleted> kafkaMessage = KafkaMessage.from(event);
-        // 메트릭용 && 캐시 무효화
-        // 순서 보장이 필요 없으므로 key 없이 전송
-        kafkaTemplate.send(KafkaTopics.CATALOG, kafkaMessage);
+        kafkaTemplate.send(KafkaTopics.CATALOG, event.productId().toString(), kafkaMessage);
     }
 }

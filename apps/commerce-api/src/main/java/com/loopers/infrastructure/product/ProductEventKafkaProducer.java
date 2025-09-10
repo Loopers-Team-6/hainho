@@ -20,8 +20,6 @@ public class ProductEventKafkaProducer {
     @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
     public void produce(ProductFound event) {
         KafkaMessage<ProductFound> kafkaMessage = KafkaMessage.from(event);
-        // 메트릭용
-        // 순서 보장이 필요 없으므로 key 없이 전송
-        kafkaTemplate.send(KafkaTopics.CATALOG, kafkaMessage);
+        kafkaTemplate.send(KafkaTopics.CATALOG, event.productId().toString(), kafkaMessage);
     }
 }

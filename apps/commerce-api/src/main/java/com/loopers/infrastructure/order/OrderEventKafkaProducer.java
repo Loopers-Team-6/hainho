@@ -22,8 +22,6 @@ public class OrderEventKafkaProducer {
     @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
     public void produce(OrderCreated event) {
         KafkaMessage<OrderCreated> kafkaMessage = KafkaMessage.from(event);
-        // 감사 로그 용
-        // 주문 생성 이벤트는 주문 ID를 키로 사용하여 순서 보장
         kafkaTemplate.send(KafkaTopics.ORDER, event.orderId().toString(), kafkaMessage);
     }
 
@@ -31,8 +29,6 @@ public class OrderEventKafkaProducer {
     @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
     public void produce(OrderCancelled event) {
         KafkaMessage<OrderCancelled> kafkaMessage = KafkaMessage.from(event);
-        // 감사 로그 용
-        // 주문 취소 이벤트는 주문 ID를 키로 사용하여 순서 보장
         kafkaTemplate.send(KafkaTopics.ORDER, event.orderId().toString(), kafkaMessage);
     }
 
@@ -40,8 +36,6 @@ public class OrderEventKafkaProducer {
     @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
     public void produce(OrderCompleted event) {
         KafkaMessage<OrderCompleted> kafkaMessage = KafkaMessage.from(event);
-        // 감사 로그 용 && 통계용
-        // 주문 완료 이벤트는 주문 ID를 키로 사용하여 순서 보장
         kafkaTemplate.send(KafkaTopics.ORDER, event.orderId().toString(), kafkaMessage);
     }
 }
