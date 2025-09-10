@@ -2,7 +2,7 @@ package com.loopers.application.audit;
 
 import com.loopers.domain.audit.AuditLogService;
 import com.loopers.domain.event.EventHandledService;
-import com.loopers.interfaces.consumer.audit.*;
+import com.loopers.interfaces.consumer.events.order.*;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;

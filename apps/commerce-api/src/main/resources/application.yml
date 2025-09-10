@@ -31,10 +31,11 @@ springdoc:
   swagger-ui:
     path: /swagger-ui.html
 
-kafka:
-  topics:
-    order: order-events
-    catalog: catalog-events
+management:
+  endpoints:
+    web:
+      exposure:
+        include: "health,info,prometheus"
 
 ---
 spring:

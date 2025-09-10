@@ -1,6 +1,6 @@
 package com.loopers.domain.audit;
 
-import com.loopers.interfaces.consumer.audit.*;
+import com.loopers.interfaces.consumer.events.order.*;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;

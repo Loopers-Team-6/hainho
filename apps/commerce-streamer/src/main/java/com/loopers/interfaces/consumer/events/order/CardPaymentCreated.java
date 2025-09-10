@@ -1,4 +1,4 @@
-package com.loopers.interfaces.consumer.audit;
+package com.loopers.interfaces.consumer.events.order;
 
 public record CardPaymentCreated(
         Long paymentId,
@@ -6,5 +6,5 @@ public record CardPaymentCreated(
         String cardType,
         String cardNumber,
         Long amount
-) {
+) implements OrderTopicEvent {
 }

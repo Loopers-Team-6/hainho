@@ -15,7 +15,7 @@ spring:
   main:
     web-application-type: servlet
   application:
-    name: commerce-api
+    name: commerce-streamer
   profiles:
     active: local
   config:
@@ -25,13 +25,6 @@ spring:
       - kafka.yml
       - logging.yml
       - monitoring.yml
-
-kafka:
-  topic:
-    order: order-events
-    catalog: catalog-events
-  group:
-    audit-log: audit-log-group
 
 ---
 spring:
