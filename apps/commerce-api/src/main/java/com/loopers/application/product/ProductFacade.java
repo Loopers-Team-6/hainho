@@ -27,8 +27,8 @@ public class ProductFacade {
         ProductInfo.Get productInfo = productService.getProductInfo(productId, userId);
         BrandInfo.Get brandInfo = brandService.getBrandInfo(productInfo.brandId());
         LikeInfo.Get likeInfo = likeService.getLikeProductInfo(userId, productId);
-
-        return ProductResult.Get.Detail.from(productInfo, brandInfo, likeInfo);
+        Long ranking = rankingService.getRanking(productId).orElse(null);
+        return ProductResult.Get.Detail.from(productInfo, brandInfo, likeInfo, ranking);
     }
 
     public ProductResult.Get.Page getProductPage(Long userId, Long brandId, Pageable pageable) {

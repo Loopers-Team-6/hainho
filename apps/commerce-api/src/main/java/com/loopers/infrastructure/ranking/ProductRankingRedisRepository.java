@@ -8,8 +8,10 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Component;
 
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 @Component
 @RequiredArgsConstructor(access = AccessLevel.PROTECTED)
@@ -49,5 +51,16 @@ public class ProductRankingRedisRepository implements ProductRankingRepository {
 
     private String generateKey(String date) {
         return "rank:all:" + date;
+    }
+
+    @Override
+    public Optional<Long> getRanking(LocalDate date, Long productId) {
+        String key = generateKey(date.toString());
+        Long ranking = redisTemplate.opsForZSet().reverseRank(key, productId);
+        return Optional.ofNullable(toRanking(ranking));
+    }
+
+    private Long toRanking(Long ranking) {
+        return ranking == null ? null : ranking + 1;
     }
 }

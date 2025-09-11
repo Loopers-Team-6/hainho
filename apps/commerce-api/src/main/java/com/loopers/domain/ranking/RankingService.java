@@ -5,7 +5,10 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
+import java.time.ZonedDateTime;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor(access = AccessLevel.PROTECTED)
@@ -19,5 +22,10 @@ public class RankingService {
 
     public Long getTotalCount(String date) {
         return productRankingRepository.getTotalCount(date);
+    }
+
+    public Optional<Long> getRanking(Long productId) {
+        LocalDate curDate = ZonedDateTime.now().toLocalDate();
+        return productRankingRepository.getRanking(curDate, productId);
     }
 }

@@ -19,15 +19,17 @@ public final class ProductResult {
                 String name,
                 String description,
                 Long price,
+                Long ranking,
                 Brand brand,
                 Like like
         ) {
-            public static Detail from(ProductInfo.Get productInfo, BrandInfo.Get brandInfo, LikeInfo.Get likeInfo) {
+            public static Detail from(ProductInfo.Get productInfo, BrandInfo.Get brandInfo, LikeInfo.Get likeInfo, Long ranking) {
                 return new Detail(
                         productInfo.id(),
                         productInfo.name(),
                         productInfo.description(),
                         productInfo.price(),
+                        ranking,
                         Brand.from(brandInfo),
                         Like.from(likeInfo)
                 );
