@@ -7,6 +7,8 @@ import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Component;
 
 import java.time.LocalDate;
+import java.util.Map;
+
 
 @Component
 @RequiredArgsConstructor(access = AccessLevel.PROTECTED)
@@ -20,8 +22,10 @@ public class ProductRankingRedisRepository implements ProductRankingRepository {
     }
 
     @Override
-    public void incrementScore(Long productId, double score, LocalDate actionedAt) {
+    public void incrementScore(Map<Long, Double> productIdScoreMap, LocalDate actionedAt) {
         String rankingKey = generateKey(actionedAt);
-        redisTemplate.opsForZSet().incrementScore(rankingKey, productId, score);
+        productIdScoreMap.forEach((productId, score) -> {
+            redisTemplate.opsForZSet().incrementScore(rankingKey, productId, score);
+        });
     }
 }

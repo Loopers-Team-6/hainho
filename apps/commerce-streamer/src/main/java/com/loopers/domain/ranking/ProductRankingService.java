@@ -3,8 +3,10 @@ package com.loopers.domain.ranking;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
+import java.util.Map;
 import java.util.Optional;
 
 @Component
@@ -17,34 +19,28 @@ public class ProductRankingService {
     private final RankingWeightRepository rankingWeightRepository;
     private final ProductRankingRepository productRankingRepository;
 
-    public void rankByViews(Long productId, Long views, LocalDate rankDate) {
-        double score = calculateScoreByView(views);
-        productRankingRepository.incrementScore(productId, score, rankDate);
-    }
-
-    private double calculateScoreByView(Long views) {
+    @Transactional(readOnly = true)
+    public double calculateScoreByView(Long views) {
         double weight = getWeight(WeightType.VIEW);
         return views * weight;
     }
 
-    public void rankByPurchases(Long productId, Long price, Long amount, LocalDate rankDate) {
-        double score = calculateScoreByPriceAndAmount(price, amount);
-        productRankingRepository.incrementScore(productId, score, rankDate);
-    }
-
-    private double calculateScoreByPriceAndAmount(Long price, Long amount) {
+    @Transactional(readOnly = true)
+    public double calculateScoreByPriceAndAmount(Long price, Long amount) {
         double weight = getWeight(WeightType.PURCHASE);
         return (price * amount) * weight;
     }
 
-    public void rankByLikes(Long productId, Long likes, LocalDate rankDate) {
-        double score = calculateScoreByLike(likes);
-        productRankingRepository.incrementScore(productId, score, rankDate);
+    @Transactional(readOnly = true)
+    public double calculateScoreByLikeCreated(Long count) {
+        double weight = getWeight(WeightType.LIKE);
+        return count * weight;
     }
 
-    private double calculateScoreByLike(Long likes) {
+    @Transactional(readOnly = true)
+    public double calculateScoreByLikeDeleted(Long count) {
         double weight = getWeight(WeightType.LIKE);
-        return likes * weight;
+        return count * weight * -1;
     }
 
     private double getWeight(WeightType weightType) {
@@ -57,5 +53,9 @@ public class ProductRankingService {
             };
         }
         return optionalWeight.get().getWeight();
+    }
+
+    public void rank(Map<Long, Double> productIdScoreMap, LocalDate producedDate) {
+        productRankingRepository.incrementScore(productIdScoreMap, producedDate);
     }
 }

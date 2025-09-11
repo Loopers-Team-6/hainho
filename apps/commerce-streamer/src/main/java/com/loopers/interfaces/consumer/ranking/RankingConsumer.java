@@ -27,16 +27,14 @@ public class RankingConsumer {
             containerFactory = RankingKafkaConfig.RANKING_LISTENER
     )
     public void consumeOrderTopicEvent(List<OrderTopicMessage> messages, Acknowledgment acknowledgment) {
-        for (OrderTopicMessage message : messages) {
-            switch (message.payload()) {
-                case OrderCompleted event -> rankingFacade.rankByPurchases(event, message.producedAt());
-                default -> {
-                }
-            }
+        List<OrderTopicMessage> orderCompletedMessages = messages.stream().filter(message -> message.payload() instanceof OrderCompleted).toList();
+        if (orderCompletedMessages.isEmpty()) {
+            acknowledgment.acknowledge();
+            return;
         }
+        rankingFacade.rankByOrderEvent(orderCompletedMessages);
         acknowledgment.acknowledge();
     }
-
 
     @KafkaListener(
             topics = {KafkaTopics.CATALOG},
@@ -44,15 +42,16 @@ public class RankingConsumer {
             containerFactory = RankingKafkaConfig.RANKING_LISTENER
     )
     public void consumeCatalogTopicEvent(List<CatalogTopicMessage> messages, Acknowledgment acknowledgment) {
-        for (CatalogTopicMessage message : messages) {
-            switch (message.payload()) {
-                case LikeProductCreated event -> rankingFacade.rankByLikes(event, message.producedAt());
-                case LikeProductDeleted event -> rankingFacade.rankByUnlikes(event, message.producedAt());
-                case ProductFound event -> rankingFacade.rankByViews(event, message.producedAt());
-                default -> {
-                }
-            }
+        List<CatalogTopicMessage> catalogTopicMessages = messages.stream()
+                .filter(message -> message.payload() instanceof ProductFound
+                        || message.payload() instanceof LikeProductCreated
+                        || message.payload() instanceof LikeProductDeleted)
+                .toList();
+        if (catalogTopicMessages.isEmpty()) {
+            acknowledgment.acknowledge();
+            return;
         }
+        rankingFacade.rankByCatalogEvent(messages);
         acknowledgment.acknowledge();
     }
 }
