@@ -117,6 +117,10 @@ public class RankingFacade {
     public void carryOverDailyRanking(LocalDate currentDate) {
         LocalDate nextDate = currentDate.plusDays(1);
         List<RankingInfo.WithScore> rankingInfos = productRankingService.getRankingAll(currentDate);
-        productRankingService.addRanking(nextDate, rankingInfos);
+        if (rankingInfos.isEmpty()) {
+            return;
+        }
+        List<RankingInfo.WithScore> normalizedRankingInfos = productRankingService.normalizeScore(rankingInfos);
+        productRankingService.addRanking(nextDate, normalizedRankingInfos);
     }
 }

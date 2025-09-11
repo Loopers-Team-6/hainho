@@ -16,6 +16,7 @@ public class ProductRankingService {
     private static final double DEFAULT_VIEW_WEIGHT = 0.05;
     private static final double DEFAULT_PURCHASE_WEIGHT = 1.0;
     private static final double DEFAULT_LIKE_WEIGHT = 0.25;
+    private static final double SCORE_CAP = 0.05;
 
     private final RankingWeightRepository rankingWeightRepository;
     private final ProductRankingRepository productRankingRepository;
@@ -66,5 +67,27 @@ public class ProductRankingService {
 
     public void addRanking(LocalDate date, List<RankingInfo.WithScore> rankingInfos) {
         productRankingRepository.addRanking(date, rankingInfos);
+    }
+
+    public List<RankingInfo.WithScore> normalizeScore(List<RankingInfo.WithScore> rankingInfos) {
+        if (rankingInfos.isEmpty()) {
+            return List.of();
+        }
+        double factor = calculateFactor(rankingInfos);
+        return applyFactor(rankingInfos, factor);
+    }
+
+    private List<RankingInfo.WithScore> applyFactor(List<RankingInfo.WithScore> rankingInfos, double factor) {
+        return rankingInfos.stream()
+                .map(info -> new RankingInfo.WithScore(
+                        info.productId(),
+                        info.score() * factor
+                ))
+                .toList();
+    }
+
+    private double calculateFactor(List<RankingInfo.WithScore> rankingInfos) {
+        double maxScore = rankingInfos.getFirst().score();
+        return SCORE_CAP / maxScore;
     }
 }
