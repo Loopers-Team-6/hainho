@@ -18,6 +18,14 @@ public class ProductRankingService {
     private static final double DEFAULT_LIKE_WEIGHT = 0.25;
     private static final double SCORE_CAP = 0.05;
 
+    // 기준가격(원)
+    // 카테고리별 중앙가/대표가로 잡으면 좋음.
+    private static final long REF_PRICE = 50_000L;
+
+    // Isoelastic 지수 α (0<α≤1): α=1이면 선형(압축 없음), α가 작아질수록 고가 압축·저가 완화가 강해짐.
+    // 운영 권장 범위: 0.75~0.90 (도메인 데이터로 튜닝)
+    private static final double PRICE_ALPHA = 0.80;
+
     private final RankingWeightRepository rankingWeightRepository;
     private final ProductRankingRepository productRankingRepository;
 
@@ -30,7 +38,29 @@ public class ProductRankingService {
     @Transactional(readOnly = true)
     public double calculateScoreByPriceAndAmount(Long price, Long amount) {
         double weight = getWeight(WeightType.PURCHASE);
-        return (price * amount) * weight;
+        double transformedPrice = transformPriceIsoelastic(price);
+        return (transformedPrice * amount) * weight;
+    }
+
+    /**
+     * Isoelastic(거듭제곱) 가격 변환으로 가격 영향력을 완만하게 만듭니다.
+     * <p>
+     * 정의: p' = REF_PRICE * (max(price,0) / REF_PRICE) ^ PRICE_ALPHA
+     * <p>
+     * 성질:
+     * - p = REF_PRICE일 때 p' = REF_PRICE (기준점 보정)
+     * - 0 < PRICE_ALPHA < 1 이면 오목(고가 압축·저가 완화), α=1이면 항등(변환 없음)
+     * - 상수 탄력성: d ln p' / d ln p = α (탄력성이 일정)
+     * <p>
+     * 주의:
+     * - REF_PRICE > 0 이어야 합니다(0이면 분모 0).
+     *
+     * @param price 원가격(원, 음수는 0으로 처리)
+     * @return 변환된 유효가격(스코어 산식에 사용)
+     */
+    private double transformPriceIsoelastic(long price) {
+        long p = Math.max(0L, price);
+        return REF_PRICE * Math.pow(p / (double) REF_PRICE, PRICE_ALPHA);
     }
 
     @Transactional(readOnly = true)

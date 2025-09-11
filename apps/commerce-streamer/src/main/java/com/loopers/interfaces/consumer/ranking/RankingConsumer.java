@@ -14,6 +14,7 @@ import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.kafka.support.Acknowledgment;
 import org.springframework.stereotype.Component;
 
+import java.time.ZonedDateTime;
 import java.util.List;
 
 @Component
@@ -52,6 +53,7 @@ public class RankingConsumer {
             return;
         }
         rankingFacade.rankByCatalogEvent(messages);
+        rankingFacade.carryOverDailyRanking(ZonedDateTime.now().toLocalDate());
         acknowledgment.acknowledge();
     }
 }
