@@ -46,4 +46,26 @@ public interface ProductV1ApiSepc {
             )
             Long userId
     );
+
+    @Operation(
+            summary = "상품 랭킹 조회",
+            description = "상품 랭킹 정보를 조회합니다."
+    )
+    ApiResponse<ProductV1Dto.GetProducts.Response> getProductRanking(
+            @Schema(
+                    name = "상품 랭킹 조회 요청",
+                    description = "상품 랭킹 조회에 필요한 정보를 담고 있는 요청 객체"
+            )
+            ProductV1Dto.GetProductRankings.Request request,
+            @Schema(
+                    name = "페이지 정보",
+                    description = "상품 목록을 조회할 때 사용할 페이지 정보"
+            )
+            Pageable pageable,
+            @Schema(
+                    name = "X-USER-ID",
+                    description = "조회할 사용자의 ID"
+            )
+            Long userId
+    );
 }

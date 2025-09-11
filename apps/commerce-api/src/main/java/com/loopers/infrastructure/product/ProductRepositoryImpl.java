@@ -102,4 +102,38 @@ public class ProductRepositoryImpl implements ProductRepository {
         productPageTotalCountRedisTemplate.set(brandId, totalCount);
         return totalCount;
     }
+
+    @Override
+    public List<ProductInfo.GetPage> getPage(List<Long> productIds, Long userId) {
+        Expression<Boolean> isLikedExpression =
+                (userId != null) ? likeProduct.id.isNotNull()
+                        : Expressions.constant(false);
+
+        JPAQuery<ProductInfo.GetPage> query = queryFactory.select(
+                        new QProductInfo_GetPage(
+                                product.id,
+                                product.name.value,
+                                product.price.value,
+                                new QProductInfo_GetPage_Brand(
+                                        brand.id,
+                                        brand.name.value
+                                ),
+                                new QProductInfo_GetPage_Like(
+                                        likeProductCount.countValue.value,
+                                        isLikedExpression
+                                )
+                        ))
+                .from(product)
+                .leftJoin(brand).on(brand.id.eq(product.brandId))
+                .leftJoin(likeProductCount).on(likeProductCount.productId.eq(product.id))
+                .where(product.id.in(productIds));
+
+        if (userId != null) {
+            query.leftJoin(likeProduct)
+                    .on(likeProduct.productId.eq(product.id)
+                            .and(likeProduct.userId.eq(userId)));
+        }
+
+        return query.fetch();
+    }
 }

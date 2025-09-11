@@ -3,10 +3,12 @@ package com.loopers.interfaces.consumer.events.catalog;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import com.loopers.interfaces.consumer.events.KafkaMessage;
 
+import java.time.ZonedDateTime;
+
 public record CatalogTopicMessage(
         String eventId,
         String eventType,
-        java.time.ZonedDateTime producedAt,
+        ZonedDateTime producedAt,
         @JsonTypeInfo(
                 use = JsonTypeInfo.Id.NAME,
                 include = JsonTypeInfo.As.EXTERNAL_PROPERTY,

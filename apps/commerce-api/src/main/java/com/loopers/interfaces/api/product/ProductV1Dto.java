@@ -119,4 +119,12 @@ public class ProductV1Dto {
             }
         }
     }
+
+    @NoArgsConstructor(access = AccessLevel.PRIVATE)
+    public static class GetProductRankings {
+        public record Request(
+                String date
+        ) {
+        }
+    }
 }

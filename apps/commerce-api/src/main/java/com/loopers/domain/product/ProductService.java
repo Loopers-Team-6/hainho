@@ -1,5 +1,6 @@
 package com.loopers.domain.product;
 
+import com.loopers.domain.ranking.RankingInfo;
 import com.loopers.support.error.CoreException;
 import com.loopers.support.error.ErrorType;
 import lombok.AccessLevel;
@@ -8,6 +9,12 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 @Component
 @RequiredArgsConstructor(access = AccessLevel.PROTECTED)
@@ -69,5 +76,22 @@ public class ProductService {
         ProductStock productStock = getProductStockWithLock(product.productId());
         productStock.refund(product.quantityToRefund());
         productStockRepository.save(productStock);
+    }
+
+    @Transactional(readOnly = true)
+    public List<ProductInfo.GetPage> getProductRankingPage(RankingInfo.Get rankingInfo, Long userId) {
+        List<Long> productIds = rankingInfo.items().stream().map(RankingInfo.Get.Item::id).toList();
+        List<ProductInfo.GetPage> products = productRepository.getPage(productIds, userId);
+        return sortByRanking(productIds, products);
+    }
+
+    private List<ProductInfo.GetPage> sortByRanking(List<Long> sortedProductIds, List<ProductInfo.GetPage> products) {
+        Map<Long, ProductInfo.GetPage> productMap = products.stream()
+                .collect(Collectors.toMap(ProductInfo.GetPage::id, Function.identity()));
+
+        return sortedProductIds.stream()
+                .map(productMap::get)
+                .filter(Objects::nonNull)
+                .toList();
     }
 }
