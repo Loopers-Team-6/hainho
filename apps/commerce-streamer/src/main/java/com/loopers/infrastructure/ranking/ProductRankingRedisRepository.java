@@ -3,7 +3,9 @@ package com.loopers.infrastructure.ranking;
 import com.loopers.domain.ranking.ProductRankingRepository;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.redis.core.RedisOperations;
 import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.data.redis.core.SessionCallback;
 import org.springframework.stereotype.Component;
 
 import java.time.LocalDate;
@@ -24,8 +26,18 @@ public class ProductRankingRedisRepository implements ProductRankingRepository {
     @Override
     public void incrementScore(Map<Long, Double> productIdScoreMap, LocalDate actionedAt) {
         String rankingKey = generateKey(actionedAt);
-        productIdScoreMap.forEach((productId, score) -> {
-            redisTemplate.opsForZSet().incrementScore(rankingKey, productId, score);
+        incrementScoreAllAtOnce(productIdScoreMap, rankingKey);
+    }
+
+    private void incrementScoreAllAtOnce(Map<Long, Double> productIdScoreMap, String rankingKey) {
+        redisTemplate.executePipelined(new SessionCallback<Object>() {
+            @Override
+            public <K, V> Object execute(RedisOperations<K, V> operations) {
+                RedisOperations<String, Object> ops = (RedisOperations<String, Object>) operations;
+                productIdScoreMap.forEach((productId, score) ->
+                        ops.opsForZSet().incrementScore(rankingKey, productId.toString(), score));
+                return null;
+            }
         });
     }
 }
