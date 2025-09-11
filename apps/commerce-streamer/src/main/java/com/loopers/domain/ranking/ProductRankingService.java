@@ -6,6 +6,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
@@ -57,5 +58,13 @@ public class ProductRankingService {
 
     public void rank(Map<Long, Double> productIdScoreMap, LocalDate producedDate) {
         productRankingRepository.incrementScore(productIdScoreMap, producedDate);
+    }
+
+    public List<RankingInfo.WithScore> getRankingAll(LocalDate date) {
+        return productRankingRepository.getRankingAllWithScore(date);
+    }
+
+    public void addRanking(LocalDate date, List<RankingInfo.WithScore> rankingInfos) {
+        productRankingRepository.addRanking(date, rankingInfos);
     }
 }

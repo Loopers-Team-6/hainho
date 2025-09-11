@@ -1,6 +1,7 @@
 package com.loopers.application.ranking;
 
 import com.loopers.domain.ranking.ProductRankingService;
+import com.loopers.domain.ranking.RankingInfo;
 import com.loopers.interfaces.consumer.events.catalog.CatalogTopicMessage;
 import com.loopers.interfaces.consumer.events.catalog.LikeProductCreated;
 import com.loopers.interfaces.consumer.events.catalog.LikeProductDeleted;
@@ -111,5 +112,11 @@ public class RankingFacade {
                                 Collectors.summingDouble(item -> productRankingService.calculateScoreByPriceAndAmount(item.price(), item.quantity()))
                         )
                 );
+    }
+
+    public void carryOverDailyRanking(LocalDate currentDate) {
+        LocalDate nextDate = currentDate.plusDays(1);
+        List<RankingInfo.WithScore> rankingInfos = productRankingService.getRankingAll(currentDate);
+        productRankingService.addRanking(nextDate, rankingInfos);
     }
 }
