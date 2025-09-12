@@ -23,16 +23,15 @@ public class RankingConsumer {
 
     @KafkaListener(
             topics = {KafkaTopics.ORDER},
-            groupId = RankingKafkaConfig.RANKING_GROUP,
-            containerFactory = RankingKafkaConfig.RANKING_LISTENER
+            groupId = RankingCriticalKafkaConfig.RANKING_CRITICAL_GROUP,
+            containerFactory = RankingCriticalKafkaConfig.RANKING_CRITICAL_LISTENER
     )
-    public void consumeOrderTopicEvent(List<OrderTopicMessage> messages, Acknowledgment acknowledgment) {
-        List<OrderTopicMessage> orderCompletedMessages = messages.stream().filter(message -> message.payload() instanceof OrderCompleted).toList();
-        if (orderCompletedMessages.isEmpty()) {
+    public void consumeOrderTopicEvent(OrderTopicMessage message, Acknowledgment acknowledgment) {
+        if (!(message.payload() instanceof OrderCompleted)) {
             acknowledgment.acknowledge();
             return;
         }
-        rankingFacade.rankByOrderEvent(orderCompletedMessages);
+        rankingFacade.rankByOrderEvent(message, RankingCriticalKafkaConfig.RANKING_CRITICAL_GROUP);
         acknowledgment.acknowledge();
     }
 
