@@ -14,10 +14,17 @@ import java.util.Optional;
 @RequiredArgsConstructor(access = AccessLevel.PROTECTED)
 public class RankingWeightRepositoryImpl implements RankingWeightRepository {
     private final RankingWeightJpaRepository rankingWeightJpaRepository;
+    private final RankingWeightRedisRepository rankingWeightRedisRepository;
 
     @Override
     public Optional<RankingWeight> findFirstByTypeAndWeightTypeOrderByCreatedAtDesc(RankingTargetType type, WeightType weightType) {
-        return rankingWeightJpaRepository.findFirstByTypeAndWeightTypeOrderByCreatedAtDesc(type, weightType);
+        Optional<RankingWeight> optionalCachedRankingWeight = rankingWeightRedisRepository.findWeight(type, weightType);
+        if (optionalCachedRankingWeight.isPresent()) {
+            return optionalCachedRankingWeight;
+        }
+        Optional<RankingWeight> optionalRankingWeight = rankingWeightJpaRepository.findFirstByTypeAndWeightTypeOrderByCreatedAtDesc(type, weightType);
+        optionalRankingWeight.ifPresent(rankingWeight -> rankingWeightRedisRepository.save(type, weightType, rankingWeight));
+        return optionalRankingWeight;
     }
 
     @Override
