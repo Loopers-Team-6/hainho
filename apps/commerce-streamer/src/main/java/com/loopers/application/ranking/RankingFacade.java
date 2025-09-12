@@ -33,9 +33,18 @@ public class RankingFacade {
     }
 
     public void rankByCatalogEvent(List<CatalogTopicMessage> messages) {
+        Map<LocalDate, List<CatalogTopicMessage>> messagesByDate = groupMessagesByDate(messages);
+        messagesByDate.forEach(this::rankByCatalogEventPerDate);
+    }
+
+    private void rankByCatalogEventPerDate(LocalDate date, List<CatalogTopicMessage> messages) {
         Map<Long, Double> productIdScoreMap = toProductIdScoreMapFromCatalogMessages(messages);
-        LocalDate producedDate = toZoneDate(messages.get(0).producedAt());
-        productRankingService.rank(productIdScoreMap, producedDate);
+        productRankingService.rank(productIdScoreMap, date);
+    }
+
+    private Map<LocalDate, List<CatalogTopicMessage>> groupMessagesByDate(List<CatalogTopicMessage> messages) {
+        return messages.stream()
+                .collect(Collectors.groupingBy(message -> toZoneDate(message.producedAt())));
     }
 
     private Map<Long, Double> toProductIdScoreMapFromCatalogMessages(List<CatalogTopicMessage> messages) {
