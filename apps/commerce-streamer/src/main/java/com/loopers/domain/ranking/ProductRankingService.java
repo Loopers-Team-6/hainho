@@ -13,9 +13,9 @@ import java.util.Optional;
 @Component
 @RequiredArgsConstructor(access = AccessLevel.PROTECTED)
 public class ProductRankingService {
-    private static final double DEFAULT_VIEW_WEIGHT = 0.05;
-    private static final double DEFAULT_PURCHASE_WEIGHT = 1.0;
-    private static final double DEFAULT_LIKE_WEIGHT = 0.25;
+    private static final double DEFAULT_VIEW_WEIGHT = 0.1;
+    private static final double DEFAULT_PURCHASE_WEIGHT = 0.01;
+    private static final double DEFAULT_LIKE_WEIGHT = 1.0;
     private static final double SCORE_CAP = 0.05;
 
     // 기준가격(원)
