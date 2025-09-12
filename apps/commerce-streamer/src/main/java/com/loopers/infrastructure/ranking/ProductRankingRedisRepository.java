@@ -7,6 +7,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.redis.core.*;
 import org.springframework.stereotype.Component;
 
+import java.time.Duration;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Map;
@@ -18,6 +19,7 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor(access = AccessLevel.PROTECTED)
 public class ProductRankingRedisRepository implements ProductRankingRepository {
     private static final String PRODUCT_RANKING_KEY_PREFIX = "rank:all:";
+    private static final Duration RANKING_KEY_EXPIRE_DURATION = Duration.ofDays(2);
 
     private final RedisTemplate<String, Object> redisTemplate;
 
@@ -65,6 +67,7 @@ public class ProductRankingRedisRepository implements ProductRankingRepository {
     public void addRanking(LocalDate date, List<RankingInfo.WithScore> rankingInfos) {
         String rankingKey = generateKey(date);
         redisTemplate.opsForZSet().add(rankingKey, toTypedTuples(rankingInfos));
+        redisTemplate.expire(rankingKey, RANKING_KEY_EXPIRE_DURATION);
     }
 
     private Set<ZSetOperations.TypedTuple<Object>> toTypedTuples(List<RankingInfo.WithScore> rankingInfos) {
