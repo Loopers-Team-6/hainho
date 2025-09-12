@@ -1,5 +1,6 @@
 package com.loopers.domain.order.vo;
 
+import jakarta.persistence.Column;
 import jakarta.persistence.Embeddable;
 import lombok.AccessLevel;
 import lombok.EqualsAndHashCode;
@@ -13,6 +14,7 @@ import lombok.NoArgsConstructor;
 public class DiscountedPrice {
     private static final Long MIN_VALUE = 0L;
 
+    @Column(name = "discounted_price")
     private final Long value;
 
     private DiscountedPrice(Long value) {
