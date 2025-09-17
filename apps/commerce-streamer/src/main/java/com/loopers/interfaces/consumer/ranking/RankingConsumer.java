@@ -26,12 +26,15 @@ public class RankingConsumer {
             groupId = RankingCriticalKafkaConfig.RANKING_CRITICAL_GROUP,
             containerFactory = RankingCriticalKafkaConfig.RANKING_CRITICAL_LISTENER
     )
-    public void consumeOrderTopicEvent(OrderTopicMessage message, Acknowledgment acknowledgment) {
-        if (!(message.payload() instanceof OrderCompleted)) {
+    public void consumeOrderTopicEvent(List<OrderTopicMessage> messages, Acknowledgment acknowledgment) {
+        List<OrderTopicMessage> orderTopicMessages = messages.stream()
+                .filter(message -> message.payload() instanceof OrderCompleted)
+                .toList();
+        if (orderTopicMessages.isEmpty()) {
             acknowledgment.acknowledge();
             return;
         }
-        rankingFacade.rankByOrderEvent(message, RankingCriticalKafkaConfig.RANKING_CRITICAL_GROUP);
+        rankingFacade.rankByOrderEvent(orderTopicMessages);
         acknowledgment.acknowledge();
     }
 
