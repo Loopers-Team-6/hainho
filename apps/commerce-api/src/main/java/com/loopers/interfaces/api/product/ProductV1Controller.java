@@ -37,4 +37,16 @@ public class ProductV1Controller implements ProductV1ApiSepc {
         ProductV1Dto.GetDetail.Response response = ProductV1Dto.GetDetail.Response.from(detail);
         return ApiResponse.success(response);
     }
+
+    @Override
+    @GetMapping("/rankings")
+    public ApiResponse<ProductV1Dto.GetProducts.Response> getProductRanking(
+            ProductV1Dto.GetProductRankings.Request request,
+            Pageable pageable,
+            @RequestHeader(value = "X-USER-ID", required = false) Long userId
+    ) {
+        ProductResult.Get.Page page = productFacade.getProductRankingPage(userId, request.date(), pageable);
+        ProductV1Dto.GetProducts.Response response = ProductV1Dto.GetProducts.Response.from(page, pageable);
+        return ApiResponse.success(response);
+    }
 }

@@ -5,6 +5,7 @@ import com.loopers.domain.like.LikeInfo;
 import com.loopers.domain.product.ProductInfo;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
+import org.springframework.data.domain.Pageable;
 
 import java.util.List;
 
@@ -18,15 +19,17 @@ public final class ProductResult {
                 String name,
                 String description,
                 Long price,
+                Long ranking,
                 Brand brand,
                 Like like
         ) {
-            public static Detail from(ProductInfo.Get productInfo, BrandInfo.Get brandInfo, LikeInfo.Get likeInfo) {
+            public static Detail from(ProductInfo.Get productInfo, BrandInfo.Get brandInfo, LikeInfo.Get likeInfo, Long ranking) {
                 return new Detail(
                         productInfo.id(),
                         productInfo.name(),
                         productInfo.description(),
                         productInfo.price(),
+                        ranking,
                         Brand.from(brandInfo),
                         Like.from(likeInfo)
                 );
@@ -62,6 +65,13 @@ public final class ProductResult {
         public record Page(
                 org.springframework.data.domain.Page<Product> products
         ) {
+            public static Page from(List<ProductInfo.GetPage> productInfos, Pageable pageable, Long totalCount) {
+                List<Product> products = productInfos.stream()
+                        .map(Product::from)
+                        .toList();
+                return new Page(new org.springframework.data.domain.PageImpl<>(products, pageable, totalCount));
+            }
+
             public static Page from(org.springframework.data.domain.Page<ProductInfo.GetPage> productInfoPage) {
                 List<Product> productList = productInfoPage.getContent().stream()
                         .map(Product::from)

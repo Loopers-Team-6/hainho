@@ -19,22 +19,23 @@ public class Order extends BaseEntity {
     private TotalPrice totalPrice;
     @Embedded
     private DiscountedPrice discountedPrice;
-    @Enumerated
+    @Enumerated(EnumType.STRING)
     private OrderStatus status;
     @Version
     private Long version;
 
-    private Order(Long userId, TotalPrice totalPrice) {
+    private Order(Long userId, TotalPrice totalPrice, DiscountedPrice discountedPrice) {
         if (userId == null) {
             throw new CoreException(ErrorType.BAD_REQUEST, "userId는 null일 수 없습니다.");
         }
         this.userId = userId;
         this.totalPrice = totalPrice;
+        this.discountedPrice = discountedPrice;
         this.status = OrderStatus.PENDING;
     }
 
     public static Order create(Long userId, Long totalPrice) {
-        return new Order(userId, TotalPrice.of(totalPrice));
+        return new Order(userId, TotalPrice.of(totalPrice), DiscountedPrice.of(totalPrice));
     }
 
     public void applyDiscount(Long discountingAmount) {

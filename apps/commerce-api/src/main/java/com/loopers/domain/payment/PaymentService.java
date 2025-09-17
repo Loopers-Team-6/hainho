@@ -31,9 +31,9 @@ public class PaymentService {
     @Transactional
     public PaymentInfo.Get createPointPayment(PaymentCommand.Create command) {
         Payment payment = Payment.create(command);
-        paymentRepository.save(payment);
+        Payment savedPayment = paymentRepository.save(payment);
 
-        PointPaymentCreated event = PointPaymentCreated.from(payment, command.userId());
+        PointPaymentCreated event = PointPaymentCreated.from(savedPayment, command.userId());
         paymentEventPublisher.publish(event);
 
         return PaymentInfo.Get.from(payment);

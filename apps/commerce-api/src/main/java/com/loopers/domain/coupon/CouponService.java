@@ -19,6 +19,9 @@ public class CouponService {
 
     @Transactional
     public Long useCoupon(Long couponIssuanceId, Long orderId, Long orderPrice) {
+        if (couponIssuanceId == null) {
+            return 0L;
+        }
         CouponIssuance couponIssuance = getCouponIssuance(couponIssuanceId);
 
         Long couponId = couponIssuance.getCouponId();

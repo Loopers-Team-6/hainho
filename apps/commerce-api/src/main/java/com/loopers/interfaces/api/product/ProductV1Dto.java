@@ -84,6 +84,7 @@ public class ProductV1Dto {
                     Long id,
                     String name,
                     Long price,
+                    Long ranking,
                     Brand brand,
                     Like like,
                     String description
@@ -93,6 +94,7 @@ public class ProductV1Dto {
                             product.id(),
                             product.name(),
                             product.price(),
+                            product.ranking(),
                             Brand.from(product.brand()),
                             Like.from(product.like()),
                             product.description()
@@ -117,6 +119,14 @@ public class ProductV1Dto {
                     return new Like(like.count(), like.isLiked());
                 }
             }
+        }
+    }
+
+    @NoArgsConstructor(access = AccessLevel.PRIVATE)
+    public static class GetProductRankings {
+        public record Request(
+                String date
+        ) {
         }
     }
 }
