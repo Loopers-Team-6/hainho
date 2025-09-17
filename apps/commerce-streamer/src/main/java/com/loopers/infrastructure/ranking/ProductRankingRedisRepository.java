@@ -20,6 +20,7 @@ import java.util.stream.Collectors;
 public class ProductRankingRedisRepository implements ProductRankingRepository {
     private static final String PRODUCT_RANKING_KEY_PREFIX = "rank:all:";
     private static final Duration RANKING_KEY_EXPIRE_DURATION = Duration.ofDays(2);
+    private static final int CHUNK_SIZE = 200;
 
     private final RedisTemplate<String, Object> redisTemplate;
 
@@ -30,16 +31,26 @@ public class ProductRankingRedisRepository implements ProductRankingRepository {
     @Override
     public void incrementScore(Map<Long, Double> productIdScoreMap, LocalDate actionedAt) {
         String rankingKey = generateKey(actionedAt);
-        incrementScoreAllAtOnce(productIdScoreMap, rankingKey);
+        incrementScoreInChunks(productIdScoreMap, rankingKey);
     }
 
-    private void incrementScoreAllAtOnce(Map<Long, Double> productIdScoreMap, String rankingKey) {
+    private void incrementScoreInChunks(Map<Long, Double> productIdScoreMap, String rankingKey) {
+        List<Map.Entry<Long, Double>> entries = productIdScoreMap.entrySet().stream().toList();
+
+        for (int i = 0; i < entries.size(); i += CHUNK_SIZE) {
+            int end = Math.min(i + CHUNK_SIZE, entries.size());
+            List<Map.Entry<Long, Double>> chunk = entries.subList(i, end);
+            executePipelineForChunk(chunk, rankingKey);
+        }
+    }
+
+    private void executePipelineForChunk(List<Map.Entry<Long, Double>> chunk, String rankingKey) {
         redisTemplate.executePipelined(new SessionCallback<Object>() {
             @Override
             public <K, V> Object execute(RedisOperations<K, V> operations) {
                 RedisOperations<String, Object> ops = (RedisOperations<String, Object>) operations;
-                productIdScoreMap.forEach((productId, score) ->
-                        ops.opsForZSet().incrementScore(rankingKey, productId, score));
+                chunk.forEach(entry ->
+                        ops.opsForZSet().incrementScore(rankingKey, entry.getKey(), entry.getValue()));
                 return null;
             }
         });

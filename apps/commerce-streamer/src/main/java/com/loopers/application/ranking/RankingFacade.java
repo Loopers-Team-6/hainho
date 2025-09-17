@@ -1,6 +1,5 @@
 package com.loopers.application.ranking;
 
-import com.loopers.domain.event.EventHandledService;
 import com.loopers.domain.ranking.ProductRankingService;
 import com.loopers.domain.ranking.RankingInfo;
 import com.loopers.interfaces.consumer.events.catalog.CatalogTopicMessage;
@@ -26,14 +25,13 @@ import java.util.stream.Collectors;
 public class RankingFacade {
     private static final ZoneId ZONE_ID = ZoneId.systemDefault();
     private final ProductRankingService productRankingService;
-    private final EventHandledService eventHandledService;
 
     private LocalDate toZoneDate(ZonedDateTime producedAt) {
         return producedAt.withZoneSameInstant(ZONE_ID).toLocalDate();
     }
 
     public void rankByCatalogEvent(List<CatalogTopicMessage> messages) {
-        Map<LocalDate, List<CatalogTopicMessage>> messagesByDate = groupMessagesByDate(messages);
+        Map<LocalDate, List<CatalogTopicMessage>> messagesByDate = groupCatalogMessagesByDate(messages);
         messagesByDate.forEach(this::rankByCatalogEventPerDate);
     }
 
@@ -42,7 +40,7 @@ public class RankingFacade {
         productRankingService.rank(productIdScoreMap, date);
     }
 
-    private Map<LocalDate, List<CatalogTopicMessage>> groupMessagesByDate(List<CatalogTopicMessage> messages) {
+    private Map<LocalDate, List<CatalogTopicMessage>> groupCatalogMessagesByDate(List<CatalogTopicMessage> messages) {
         return messages.stream()
                 .collect(Collectors.groupingBy(message -> toZoneDate(message.producedAt())));
     }
@@ -101,21 +99,29 @@ public class RankingFacade {
         return productIdScoreMap;
     }
 
-    public void rankByOrderEvent(OrderTopicMessage message, String groupId) {
-        if (!(message.payload() instanceof OrderCompleted)) {
-            return;
-        }
-        if (!eventHandledService.markHandledIfAbsent(message.eventId(), groupId)) {
-            return;
-        }
-        OrderCompleted event = (OrderCompleted) message.payload();
-        Map<Long, Double> productIdScoreMap = toProductIdScoreMapFromOrderMessages(event);
-        LocalDate producedDate = toZoneDate(message.producedAt());
-        productRankingService.rank(productIdScoreMap, producedDate);
+    public void rankByOrderEvent(List<OrderTopicMessage> messages) {
+        Map<LocalDate, List<OrderTopicMessage>> messagesByDate = groupOrderMessagesByDate(messages);
+        messagesByDate.forEach(this::rankByOrderEventPerDate);
     }
 
-    private Map<Long, Double> toProductIdScoreMapFromOrderMessages(OrderCompleted event) {
-        return event.items().stream()
+    private Map<LocalDate, List<OrderTopicMessage>> groupOrderMessagesByDate(List<OrderTopicMessage> messages) {
+        return messages.stream()
+                .collect(Collectors.groupingBy(message -> toZoneDate(message.producedAt())));
+    }
+
+    private void rankByOrderEventPerDate(LocalDate date, List<OrderTopicMessage> messages) {
+        List<OrderCompleted> events = messages.stream()
+                .map(OrderTopicMessage::payload)
+                .filter(OrderCompleted.class::isInstance)
+                .map(OrderCompleted.class::cast)
+                .toList();
+        Map<Long, Double> productIdScoreMap = toProductIdScoreMapFromOrderMessages(events);
+        productRankingService.rank(productIdScoreMap, date);
+    }
+
+    private Map<Long, Double> toProductIdScoreMapFromOrderMessages(List<OrderCompleted> events) {
+        return events.stream()
+                .flatMap(event -> event.items().stream())
                 .collect(Collectors.groupingBy(
                         OrderCompleted.OrderItem::productId,
                         Collectors.summingDouble(item -> productRankingService.calculateScoreByPriceAndAmount(item.price(), item.quantity()))
