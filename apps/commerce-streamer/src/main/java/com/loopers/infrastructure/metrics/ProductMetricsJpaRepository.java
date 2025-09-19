@@ -7,6 +7,7 @@ import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 
 import java.time.LocalDate;
+import java.util.List;
 
 public interface ProductMetricsJpaRepository extends JpaRepository<ProductMetrics, Long> {
     @Modifying(clearAutomatically = true, flushAutomatically = true)
@@ -28,4 +29,6 @@ public interface ProductMetricsJpaRepository extends JpaRepository<ProductMetric
             @Param("purchasesDelta") long purchasesDelta,
             @Param("likesDelta") long likesDelta
     );
+
+    List<ProductMetrics> findByMeasuredDateBetween(LocalDate startDate, LocalDate endDate);
 }
