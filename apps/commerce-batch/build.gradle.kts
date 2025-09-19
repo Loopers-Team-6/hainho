@@ -1,7 +1,5 @@
 dependencies {
     // add-ons
-    implementation(project(":apps:commerce-api"))
-    implementation(project(":apps:commerce-streamer"))
     implementation(project(":modules:jpa"))
     implementation(project(":modules:redis"))
     implementation(project(":modules:kafka"))
@@ -13,14 +11,16 @@ dependencies {
     implementation("org.springframework.boot:spring-boot-starter-web")
     implementation("org.springframework.boot:spring-boot-starter-actuator")
 
+    // batch
+    implementation("org.springframework.boot:spring-boot-starter-batch")
+    testImplementation("org.springframework.batch:spring-batch-test")
+
     // querydsl
     annotationProcessor("com.querydsl:querydsl-apt::jakarta")
     annotationProcessor("jakarta.persistence:jakarta.persistence-api")
     annotationProcessor("jakarta.annotation:jakarta.annotation-api")
 
     // test-fixtures
-    testImplementation(testFixtures(project(":apps:commerce-api")))
-    testImplementation(testFixtures(project(":apps:commerce-streamer")))
     testImplementation(testFixtures(project(":modules:jpa")))
     testImplementation(testFixtures(project(":modules:redis")))
     testImplementation(testFixtures(project(":modules:kafka")))

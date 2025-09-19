@@ -25,6 +25,11 @@ spring:
       - kafka.yml
       - logging.yml
       - monitoring.yml
+  batch:
+    jdbc:
+      initialize-schema: always
+    job:
+      enabled: false
 
 springdoc:
   use-fqn: true
